@@ -8,6 +8,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
+import authRoutes from "./routes/authRoutes.js";
 import { register } from "./controllers/auth.js";
 
 // Configurations & Middleware
@@ -17,7 +18,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy);
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
@@ -38,6 +39,9 @@ const upload = multer({ storage });
 //Routes with files
 app.post("/auth/register", upload.single("picture"), register);
 
+//Regular routes
+app.use("/auth", authRoutes);
+
 //Mongoose Setup
 const PORT = process.env.PORT || 6001;
 
@@ -47,7 +51,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(PORT, () => console.log(`Server Port connected to ${PORT}`));
+    app.listen(PORT, () => console.log(`Server connected to ${PORT}`));
   })
   .catch((error) => {
     console.log(`Doesnt work,${error.message}`);
